@@ -2,24 +2,23 @@
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace RipeLookup
 {
 	public partial class MainForm : Form
 	{
 		IPAddress[] DNS;
-		public MainForm()
-		{
-			InitializeComponent();
-		}
+
+		public MainForm() => InitializeComponent();
 
 		private void DNSLookupRequest_Click(object sender, EventArgs e)
 		{
-			DNSLookup_Click(this, null);
+			LookupDNS();
 			if (DNS.Length >= 1)
 			{
-				QueryBox.Text = DNS[0].ToString();
-				QueryLookup_Click(this, null);
+				XMLBox.Text = Get("xml");
+				JSONBox.Text = Get("json");
 				tabControl1.SelectedIndex = 0;
 			}
 		}
@@ -27,7 +26,8 @@ namespace RipeLookup
 		private string Get(string type)
 		{
 			HttpWebRequest request =
-				(HttpWebRequest)WebRequest.Create($"http://rest.db.ripe.net/search?query-string={QueryBox.Text}");
+				(HttpWebRequest)WebRequest.Create($"http://rest.db.ripe.net/search?query-string=" +
+												  $"{DNS.First() ?? new IPAddress(new byte[] { 0, 0, 0, 0 })}");
 
 			request.Method = WebRequestMethods.Http.Get;
 			request.Accept = "application/" + type;
@@ -59,13 +59,7 @@ namespace RipeLookup
 			return text.Replace("\n", "\r\n");
 		}
 
-		private void QueryLookup_Click(object sender, EventArgs e)
-		{
-			XMLBox.Text = Get("xml");
-			JSONBox.Text = Get("json");
-		}
-
-		private void DNSLookup_Click(object sender, EventArgs e)
+		private void LookupDNS()
 		{
 			try
 			{
