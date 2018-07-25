@@ -15,19 +15,21 @@ namespace RipeLookup
 		private void DNSLookupRequest_Click(object sender, EventArgs e)
 		{
 			LookupDNS();
+			if (DNS.Length == 0)
+				DNS = new IPAddress[] { new IPAddress(new byte[] { 0, 0, 0, 0 }) };
 			if (DNS.Length >= 1)
 			{
-				XMLBox.Text = Get("xml");
-				JSONBox.Text = Get("json");
+				XMLBox.Text = $"Info for {DNS.First()}:\r\n";
+				JSONBox.Text = $"Info for {DNS.First()}:\r\n";
+				XMLBox.AppendText(Get("xml"));
+				JSONBox.AppendText(Get("json"));
 				tabControl1.SelectedIndex = 0;
 			}
 		}
 
 		private string Get(string type)
 		{
-			HttpWebRequest request =
-				(HttpWebRequest)WebRequest.Create($"http://rest.db.ripe.net/search?query-string=" +
-												  $"{DNS.First() ?? new IPAddress(new byte[] { 0, 0, 0, 0 })}");
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"http://rest.db.ripe.net/search?query-string={DNS.First()}");
 
 			request.Method = WebRequestMethods.Http.Get;
 			request.Accept = "application/" + type;
@@ -45,7 +47,7 @@ namespace RipeLookup
 			var stream = response.GetResponseStream();
 			int currentByte = 0;
 			if (response.ContentLength <= 0)
-				return "Error Occurred, HTTP Response returned empty";
+				return "HTTP Response returned empty";
 			byte[] bytes = new byte[response.ContentLength];
 			int i = 0;
 			while (true)
@@ -65,21 +67,15 @@ namespace RipeLookup
 			{
 				DNS = new IPAddress[0];
 				DNS = Dns.GetHostAddresses(DNSBox.Text);
-				DNSResultBox.AppendLine("Found these for " + DNSBox.Text + ":");
+				DNSResultBox.AppendText("Found these for " + DNSBox.Text + ":\r\n");
 				foreach (var item in DNS)
-					DNSResultBox.AppendLine(item.ToString() + "\r\n");
+					DNSResultBox.AppendText(item.ToString() + "\r\n");
 				tabControl1.SelectedIndex = 2;
 			}
 			catch (Exception f)
 			{
-				DNSResultBox.AppendLine(f.Message);
+				DNSResultBox.AppendText(f.Message + "\r\n");
 			}
 		}
-	}
-
-	public static class Extensions
-	{
-		public static void AppendLine(this TextBox textBox, string text)
-			=> textBox.AppendText(text + "\r\n");
 	}
 }
