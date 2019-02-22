@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
@@ -21,13 +20,13 @@ namespace RipeLookup
 		{
 			while (true)
 			{
-				Console.WriteLine("\r\nQuery format: <typeNumber>:<value>");
-				Console.WriteLine("1: Host");
-				Console.WriteLine("2: IP");
-				Console.WriteLine("Q/>");
+				Console.WriteLine("1: Host by DNS");
+				Console.WriteLine("2: IP\\Host");
+				Console.WriteLine("\r\nQuery <typeNumber>:<value>");
 				var query = Console.ReadLine();
 				try
 				{
+					Console.WriteLine("Processing...");
 					switch (query[0])
 					{
 						case '1':
@@ -40,15 +39,14 @@ namespace RipeLookup
 							WriteParsedXml(WhoisOperator.RequestXml(query.Substring(2)));
 							break;
 						default:
-							Console.WriteLine("Wrong type number");
-							goto end;
+							Console.WriteLine("Wrong type");
+							break;
 					}
 				}
 				catch (Exception f)
 				{
 					Console.WriteLine(f.Message);
 				}
-			end:;
 			}
 		}
 	}
