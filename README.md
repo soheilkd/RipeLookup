@@ -1,2 +1,2 @@
 # RipeLookup
-Tiny app for looking up DNS/IP on RipeDB using Restful
+Simple commandline for looking up DNS/IP on RipeDB using Restful
